@@ -1,1 +1,54 @@
-﻿{ "updated": null, "matches": [] }
+{
+  "updated": "2026-06-14T18:43:20.730Z",
+  "source": "football-data.org",
+  "matches": [
+    {
+      "home": "Mexico",
+      "away": "South Africa",
+      "hg": 2,
+      "ag": 0
+    },
+    {
+      "home": "South Korea",
+      "away": "Czechia",
+      "hg": 2,
+      "ag": 1
+    },
+    {
+      "home": "Canada",
+      "away": "Bosnia-Herzegovina",
+      "hg": 1,
+      "ag": 1
+    },
+    {
+      "home": "United States",
+      "away": "Paraguay",
+      "hg": 4,
+      "ag": 1
+    },
+    {
+      "home": "Qatar",
+      "away": "Switzerland",
+      "hg": 1,
+      "ag": 1
+    },
+    {
+      "home": "Brazil",
+      "away": "Morocco",
+      "hg": 1,
+      "ag": 1
+    },
+    {
+      "home": "Haiti",
+      "away": "Scotland",
+      "hg": 0,
+      "ag": 1
+    },
+    {
+      "home": "Australia",
+      "away": "Turkey",
+      "hg": 2,
+      "ag": 0
+    }
+  ]
+}
