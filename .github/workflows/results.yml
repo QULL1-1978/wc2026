@@ -1,0 +1,42 @@
+name: Fetch World Cup results
+
+# Runs on GitHub's servers (independent of your PC), fetches finished
+# match scores, and commits results.json. GitHub Pages then serves it,
+# and the app picks it up automatically.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *" # every 30 minutes (UTC)
+  workflow_dispatch: {} # lets you run it manually from the Actions tab
+
+permissions:
+  contents: write
+
+# Avoid overlapping runs
+concurrency:
+  group: results
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Fetch results
+        env:
+          FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
+        run: node scripts/fetch-results.js
+      - name: Commit if changed
+        run: |
+          git config user.name "wc2026-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add results.json
+          if git diff --staged --quiet; then
+            echo "No changes."
+          else
+            git commit -m "results: update $(date -u +%FT%TZ)"
+            git push
+          fi

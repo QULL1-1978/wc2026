@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FIFA World Cup 2026 — Predictions Tracker</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #1a2332;
+    --panel-2: #243046;
+    --text: #e8edf3;
+    --muted: #8896a8;
+    --accent: #3b82f6;
+    --good: #22c55e;
+    --bad: #ef4444;
+    --warn: #f59e0b;
+    --border: #2d3a52;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.4;
+  }
+  header {
+    padding: 18px 24px;
+    background: linear-gradient(135deg, #1a2332 0%, #243046 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 { margin: 0; font-size: 22px; letter-spacing: 0.3px; }
+  header .subtitle { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  header .controls { margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  header .controls button {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;
+  }
+  header .controls button:hover { background: #2d3a52; }
+  #stats { font-size: 12px; color: var(--muted); }
+  nav {
+    display: flex; gap: 4px; padding: 0 24px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  nav button {
+    background: none; border: none; color: var(--muted);
+    padding: 12px 16px; cursor: pointer; font-size: 13px;
+    border-bottom: 2px solid transparent;
+  }
+  nav button.active { color: var(--text); border-bottom-color: var(--accent); }
+  main { padding: 18px 24px; max-width: 1400px; }
+  h2 { margin: 24px 0 10px; font-size: 16px; font-weight: 600; color: var(--text); }
+  h3 { margin: 0 0 8px; font-size: 14px; color: var(--text); }
+
+  .groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 14px;
+  }
+  .group-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .group-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .group-title { font-weight: 600; font-size: 15px; }
+  .standings { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 12px; }
+  .standings th, .standings td { padding: 4px 6px; text-align: center; border-bottom: 1px solid var(--border); }
+  .standings th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; }
+  .standings td.team { text-align: left; }
+  .standings tr.q1 td.team { color: var(--good); font-weight: 600; }
+  .standings tr.q2 td.team { color: var(--good); }
+  .standings tr.q3 td.team { color: var(--warn); }
+  .standings tr.out td.team { color: var(--muted); }
+  .pos-badge {
+    display: inline-block; width: 18px; text-align: center;
+    font-size: 11px; color: var(--muted); margin-right: 4px;
+  }
+
+  .match {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .match:last-child { border-bottom: none; }
+  .match .team-name { display: flex; align-items: center; gap: 6px; }
+  .match .home { justify-content: flex-end; text-align: right; }
+  .match .away { justify-content: flex-start; text-align: left; }
+  .match .score-block { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 110px; }
+  .match .predicted { font-size: 11px; color: var(--muted); }
+  .match .actual-row { display: flex; gap: 4px; align-items: center; }
+  .match input[type="number"] {
+    width: 32px; padding: 3px 4px; text-align: center;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 4px; font-size: 13px;
+  }
+  .match input[type="number"]:focus { outline: 1px solid var(--accent); }
+  .match .vs { color: var(--muted); font-size: 11px; }
+  .match.confirmed { background: rgba(34, 197, 94, 0.06); }
+  .match .date { font-size: 10px; color: var(--muted); }
+
+  .ko-section { margin-bottom: 24px; }
+  .ko-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 10px;
+  }
+  .ko-match {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .ko-match .ko-header {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--muted); margin-bottom: 6px;
+  }
+  .ko-match .ko-teams {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: 8px;
+    font-size: 13px;
+  }
+  .ko-match .pen-row { margin-top: 6px; font-size: 11px; color: var(--muted); text-align: center; }
+  .ko-match .pen-row select {
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 4px;
+    font-size: 11px; padding: 2px 4px; margin-left: 4px;
+  }
+  .ko-match.confirmed { background: rgba(34, 197, 94, 0.06); }
+  .ko-match .tbd { color: var(--muted); font-style: italic; }
+
+  .legend {
+    display: flex; gap: 16px; font-size: 11px; color: var(--muted);
+    margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .legend span::before {
+    content: ""; display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 5px; vertical-align: middle;
+  }
+  .legend .l1::before { background: var(--good); }
+  .legend .l3::before { background: var(--warn); }
+  .legend .lo::before { background: var(--muted); }
+
+  .third-places {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+  }
+  .third-places table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .third-places th, .third-places td { padding: 4px 8px; border-bottom: 1px solid var(--border); }
+  .third-places th { color: var(--muted); text-align: left; font-weight: 500; font-size: 11px; text-transform: uppercase; }
+  .third-places tr.qual td { color: var(--good); }
+  .third-places tr.out td { color: var(--muted); }
+
+  .flag { font-size: 14px; }
+  @media (max-width: 600px) {
+    main { padding: 12px; }
+    .groups-grid { grid-template-columns: 1fr; }
+    .group-card { padding: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>FIFA World Cup 2026 — Predictions Tracker</h1>
+  <div class="subtitle">Canada · Mexico · USA · June 11 – July 19, 2026 · odds + squad-value + form model · <strong>Last updated: June 7, 2026</strong> · auto-refresh 2&times;/day until kickoff</div>
+  <div class="controls">
+    <button onclick="resetAll()">Reset actual scores</button>
+    <button onclick="exportData()">Export JSON</button>
+    <button onclick="document.getElementById('importFile').click()">Import JSON</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)" />
+    <span id="stats"></span>
+  </div>
+</header>
+
+<nav>
+  <button data-tab="groups" class="active" onclick="switchTab('groups')">Group Stage</button>
+  <button data-tab="knockout" onclick="switchTab('knockout')">Knockout</button>
+  <button data-tab="model" onclick="switchTab('model')">Model / Power Ratings</button>
+</nav>
+
+<main id="content"></main>
+
+<script>
+/* ============================================================
+   DATA: Teams — multi-factor inputs (updated June 7, 2026)
+   rank : FIFA ranking (Apr 2026)
+   odds : implied title probability from sportsbook outright odds
+   sv   : total squad market value, £m (Transfermarkt, final 26-man squads)
+          — an objective, player-based measure of available quality
+   ped  : World Cup pedigree 0-10 (titles / recent deep runs)
+   inj  : injury penalty in power-points. Kept SMALL: squad value already
+          reflects the selected (post-injury) 26, and odds price injuries in,
+          so this only nudges for talismanic/late losses (avoids double-count)
+   form : warm-up nudge in power-points (pre-tournament friendlies to Jun 7)
+   note : transparency label shown in the Model tab
+   ============================================================ */
+
+const TEAMS = {
+  // Group A
+  MEX: { name: "Mexico",       rank: 15, flag: "🇲🇽", host: true,  odds: 0.0149,  sv: 168,  ped: 4, form: 0.7, note: "Beat Serbia 5-1 in warm-up" },
+  RSA: { name: "South Africa", rank: 60, flag: "🇿🇦", host: false, odds: 0.000999,sv: 40,   ped: 1 },
+  KOR: { name: "South Korea",  rank: 25, flag: "🇰🇷", host: false, odds: 0.00398, sv: 123,  ped: 3, note: "Beat El Salvador 1-0" },
+  CZE: { name: "Czechia",      rank: 41, flag: "🇨🇿", host: false, odds: 0.00498, sv: 164,  ped: 3, form: 0.2, note: "Beat Guatemala 3-1" },
+  // Group B
+  CAN: { name: "Canada",       rank: 30, flag: "🇨🇦", host: true,  odds: 0.00662, sv: 176,  ped: 1, inj: 0.3, note: "Flores (ACL) out; drew Ireland 1-1" },
+  BIH: { name: "Bosnia & H.",  rank: 52, flag: "🇧🇦", host: false, odds: 0.00398, sv: 129,  ped: 1, note: "Drew Panama 1-1" },
+  QAT: { name: "Qatar",        rank: 35, flag: "🇶🇦", host: false, odds: 0.000999,sv: 17,   ped: 1 },
+  SUI: { name: "Switzerland",  rank: 19, flag: "🇨🇭", host: false, odds: 0.0149,  sv: 288,  ped: 3, form: -0.2, note: "Drew Australia 1-1" },
+  // Group C
+  BRA: { name: "Brazil",       rank:  6, flag: "🇧🇷", host: false, odds: 0.1111,  sv: 789,  ped: 10, inj: 1.0, form: 0.3, note: "Out: Rodrygo, Estêvão, Militão; beat Egypt 2-1" },
+  MAR: { name: "Morocco",      rank:  8, flag: "🇲🇦", host: false, odds: 0.0244,  sv: 422,  ped: 5, note: "Drew Norway 1-1" },
+  HAI: { name: "Haiti",        rank: 83, flag: "🇭🇹", host: false, odds: 0.0004,  sv: 48,   ped: 1, form: 0.3, note: "Beat Peru 2-1" },
+  SCO: { name: "Scotland",     rank: 47, flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", host: false, odds: 0.00398, sv: 152,  ped: 2, inj: 1.0, form: 0.3, note: "Gilmour (knee) out; beat Bolivia 4-0" },
+  // Group D
+  USA: { name: "United States",rank: 16, flag: "🇺🇸", host: true,  odds: 0.0244,  sv: 327,  ped: 3, inj: 0.5, form: -0.5, note: "Host; Cardoso & Agyemang out; lost 1-2 to Germany" },
+  PAR: { name: "Paraguay",     rank: 64, flag: "🇵🇾", host: false, odds: 0.00662, sv: 136,  ped: 2, form: 0.2, note: "Beat Nicaragua 4-0" },
+  AUS: { name: "Australia",    rank: 26, flag: "🇦🇺", host: false, odds: 0.0020,  sv: 64,   ped: 2, inj: 0.3, form: 0.2, note: "Miller (Achilles) out; drew Switzerland 1-1" },
+  TUR: { name: "Türkiye",      rank: 42, flag: "🇹🇷", host: false, odds: 0.0149,  sv: 409,  ped: 3, form: 0.2, note: "£409m squad; beat Venezuela 2-1" },
+  // Group E
+  GER: { name: "Germany",      rank: 10, flag: "🇩🇪", host: false, odds: 0.0667,  sv: 863,  ped: 9, inj: 0.8, form: 0.5, note: "Out: ter Stegen, Gnabry, Karl; beat USA 2-1" },
+  CUR: { name: "Curaçao",      rank: 81, flag: "🇨🇼", host: false, odds: 0.0004,  sv: 23,   ped: 1, note: "Beat Aruba 4-0" },
+  CIV: { name: "Ivory Coast",  rank: 33, flag: "🇨🇮", host: false, odds: 0.00498, sv: 459,  ped: 2, form: 1.0, note: "£459m squad (11th); beat France 2-1" },
+  ECU: { name: "Ecuador",      rank: 24, flag: "🇪🇨", host: false, odds: 0.0149,  sv: 325,  ped: 2, form: 0.3, note: "Beat Guatemala 3-0" },
+  // Group F
+  NED: { name: "Netherlands",  rank:  7, flag: "🇳🇱", host: false, odds: 0.0476,  sv: 724,  ped: 7, inj: 1.5, note: "Out: Xavi Simons (ACL), Schouten (ACL), de Ligt" },
+  JPN: { name: "Japan",        rank: 18, flag: "🇯🇵", host: false, odds: 0.0196,  sv: 241,  ped: 3, inj: 1.5, note: "Out: Mitoma & Minamino (both key attackers)" },
+  SWE: { name: "Sweden",       rank: 39, flag: "🇸🇪", host: false, odds: 0.0149,  sv: 370,  ped: 4, form: -0.2, note: "Drew Greece 2-2" },
+  TUN: { name: "Tunisia",      rank: 40, flag: "🇹🇳", host: false, odds: 0.0020,  sv: 60,   ped: 1, form: -1.0, note: "Lost 0-5 to Belgium" },
+  // Group G
+  BEL: { name: "Belgium",      rank:  9, flag: "🇧🇪", host: false, odds: 0.0294,  sv: 469,  ped: 5, form: 1.0, note: "Beat Tunisia 5-0" },
+  EGY: { name: "Egypt",        rank: 29, flag: "🇪🇬", host: false, odds: 0.00398, sv: 116,  ped: 1, form: -0.2, note: "Lost 1-2 to Brazil" },
+  IRN: { name: "Iran",         rank: 21, flag: "🇮🇷", host: false, odds: 0.0020,  sv: 28,   ped: 1 },
+  NZL: { name: "New Zealand",  rank: 95, flag: "🇳🇿", host: false, odds: 0.000999,sv: 31,   ped: 1, form: -0.2, note: "Lost 0-1 to England" },
+  // Group H
+  ESP: { name: "Spain",        rank:  2, flag: "🇪🇸", host: false, odds: 0.1818,  sv: 1090, ped: 8, inj: 0.3, form: -0.3, note: "Yamal FIT, Fermín out; £1.09bn squad; drew Iraq 1-1" },
+  CPV: { name: "Cape Verde",   rank: 70, flag: "🇨🇻", host: false, odds: 0.000999,sv: 49,   ped: 1 },
+  KSA: { name: "Saudi Arabia", rank: 57, flag: "🇸🇦", host: false, odds: 0.000999,sv: 32,   ped: 1 },
+  URU: { name: "Uruguay",      rank: 17, flag: "🇺🇾", host: false, odds: 0.0196,  sv: 351,  ped: 7 },
+  // Group I
+  FRA: { name: "France",       rank:  1, flag: "🇫🇷", host: false, odds: 0.1818,  sv: 1320, ped: 10, inj: 0.3, form: -0.5, note: "Most valuable squad (£1.32bn); Saliba FIT, Ekitike out; lost 1-2 Ivory Coast" },
+  SEN: { name: "Senegal",      rank: 14, flag: "🇸🇳", host: false, odds: 0.0149,  sv: 409,  ped: 3, note: "£409m squad (13th)" },
+  IRQ: { name: "Iraq",         rank: 61, flag: "🇮🇶", host: false, odds: 0.000999,sv: 18,   ped: 1, form: 0.2, note: "Drew Spain 1-1" },
+  NOR: { name: "Norway",       rank: 44, flag: "🇳🇴", host: false, odds: 0.0385,  sv: 520,  ped: 2, form: 0.2, note: "£520m squad (9th, Haaland/Ødegaard); drew Morocco 1-1" },
+  // Group J
+  ARG: { name: "Argentina",    rank:  3, flag: "🇦🇷", host: false, odds: 0.1111,  sv: 708,  ped: 10, form: 0.3, note: "Reigning champions; beat Honduras 2-0" },
+  ALG: { name: "Algeria",      rank: 36, flag: "🇩🇿", host: false, odds: 0.00398, sv: 223,  ped: 2 },
+  AUT: { name: "Austria",      rank: 23, flag: "🇦🇹", host: false, odds: 0.0099,  sv: 235,  ped: 3 },
+  JOR: { name: "Jordan",       rank: 68, flag: "🇯🇴", host: false, odds: 0.000999,sv: 17,   ped: 1, note: "Lowest-valued squad (£16.9m)" },
+  // Group K
+  POR: { name: "Portugal",     rank:  5, flag: "🇵🇹", host: false, odds: 0.0909,  sv: 880,  ped: 6, form: 0.3, note: "4th-most valuable squad; beat Chile 2-1" },
+  COD: { name: "DR Congo",     rank: 51, flag: "🇨🇩", host: false, odds: 0.001332,sv: 129,  ped: 1 },
+  UZB: { name: "Uzbekistan",   rank: 62, flag: "🇺🇿", host: false, odds: 0.000999,sv: 61,   ped: 1 },
+  COL: { name: "Colombia",     rank: 13, flag: "🇨🇴", host: false, odds: 0.0278,  sv: 264,  ped: 3 },
+  // Group L
+  ENG: { name: "England",      rank:  4, flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", host: false, odds: 0.1333,  sv: 1130, ped: 7, form: 0.2, note: "2nd-most valuable squad (£1.13bn); beat New Zealand 1-0" },
+  CRO: { name: "Croatia",      rank: 11, flag: "🇭🇷", host: false, odds: 0.0149,  sv: 334,  ped: 7, form: 0.2, note: "2018 finalists; beat Slovenia 2-1" },
+  GHA: { name: "Ghana",        rank: 65, flag: "🇬🇭", host: false, odds: 0.00398, sv: 200,  ped: 3 },
+  PAN: { name: "Panama",       rank: 53, flag: "🇵🇦", host: false, odds: 0.000999,sv: 30,   ped: 1, form: 0.2, note: "Drew Bosnia 1-1" },
+};
+
+// Groups: order = pot seeding (pos 1-4)
+const GROUPS = {
+  A: ["MEX","RSA","KOR","CZE"],
+  B: ["CAN","BIH","QAT","SUI"],
+  C: ["BRA","MAR","HAI","SCO"],
+  D: ["USA","PAR","AUS","TUR"],
+  E: ["GER","CUR","CIV","ECU"],
+  F: ["NED","JPN","SWE","TUN"],
+  G: ["BEL","EGY","IRN","NZL"],
+  H: ["ESP","CPV","KSA","URU"],
+  I: ["FRA","SEN","IRQ","NOR"],
+  J: ["ARG","ALG","AUT","JOR"],
+  K: ["POR","COD","UZB","COL"],
+  L: ["ENG","CRO","GHA","PAN"],
+};
+
+/* ============================================================
+   GROUP FIXTURES (72 matches)
+   Each group: 6 matches in standard order
+   MD1: pos1 v pos2, pos3 v pos4
+   MD2: pos1 v pos3, pos4 v pos2
+   MD3 (simultaneous): pos4 v pos1, pos2 v pos3
+   ============================================================ */
+
+const GROUP_DATES = {
+  A: ["Jun 11", "Jun 12", "Jun 17", "Jun 18", "Jun 24", "Jun 24"],
+  B: ["Jun 12", "Jun 13", "Jun 18", "Jun 19", "Jun 24", "Jun 24"],
+  C: ["Jun 13", "Jun 14", "Jun 19", "Jun 20", "Jun 25", "Jun 25"],
+  D: ["Jun 13", "Jun 14", "Jun 19", "Jun 20", "Jun 25", "Jun 25"],
+  E: ["Jun 14", "Jun 15", "Jun 20", "Jun 21", "Jun 26", "Jun 26"],
+  F: ["Jun 14", "Jun 15", "Jun 20", "Jun 21", "Jun 26", "Jun 26"],
+  G: ["Jun 15", "Jun 16", "Jun 21", "Jun 22", "Jun 26", "Jun 26"],
+  H: ["Jun 15", "Jun 16", "Jun 21", "Jun 22", "Jun 27", "Jun 27"],
+  I: ["Jun 16", "Jun 17", "Jun 22", "Jun 23", "Jun 27", "Jun 27"],
+  J: ["Jun 16", "Jun 17", "Jun 22", "Jun 23", "Jun 27", "Jun 27"],
+  K: ["Jun 17", "Jun 18", "Jun 23", "Jun 24", "Jun 27", "Jun 27"],
+  L: ["Jun 17", "Jun 18", "Jun 23", "Jun 24", "Jun 27", "Jun 27"],
+};
+
+function buildGroupFixtures() {
+  const fixtures = [];
+  let id = 1;
+  for (const [g, teams] of Object.entries(GROUPS)) {
+    const [t1, t2, t3, t4] = teams;
+    const dates = GROUP_DATES[g];
+    const pairs = [
+      [t1, t2], [t3, t4],   // MD1
+      [t1, t3], [t4, t2],   // MD2
+      [t4, t1], [t2, t3],   // MD3
+    ];
+    pairs.forEach((p, i) => {
+      fixtures.push({
+        id: `G${id++}`, group: g, matchday: Math.floor(i/2)+1,
+        date: dates[i], home: p[0], away: p[1],
+      });
+    });
+  }
+  return fixtures;
+}
+
+const GROUP_FIXTURES = buildGroupFixtures();
+
+/* ============================================================
+   KNOCKOUT BRACKET STRUCTURE
+   Round of 32 — 16 matches with placeholders.
+   Each placeholder is resolved from group stage results.
+   ============================================================ */
+
+// Each R32 match: { id, date, slotA, slotB }
+// Slot format: "1A", "2A", "1B", "2B", ... or "3:[ABCDF]" for 3rd from one of those groups
+const R32 = [
+  { id: "R32_1",  date: "Jun 28", slotA: "2A",        slotB: "2B" },
+  { id: "R32_2",  date: "Jun 29", slotA: "1E",        slotB: "3:ABCDF" },
+  { id: "R32_3",  date: "Jun 29", slotA: "1F",        slotB: "2C" },
+  { id: "R32_4",  date: "Jun 29", slotA: "1C",        slotB: "2F" },
+  { id: "R32_5",  date: "Jun 30", slotA: "1I",        slotB: "3:CDFGH" },
+  { id: "R32_6",  date: "Jun 30", slotA: "2E",        slotB: "2I" },
+  { id: "R32_7",  date: "Jun 30", slotA: "1A",        slotB: "3:CEFHI" },
+  { id: "R32_8",  date: "Jul 1",  slotA: "1L",        slotB: "3:EHIJK" },
+  { id: "R32_9",  date: "Jul 1",  slotA: "1D",        slotB: "3:BEFIJ" },
+  { id: "R32_10", date: "Jul 1",  slotA: "1G",        slotB: "3:AEHIJ" },
+  { id: "R32_11", date: "Jul 2",  slotA: "2K",        slotB: "2L" },
+  { id: "R32_12", date: "Jul 2",  slotA: "1H",        slotB: "2J" },
+  { id: "R32_13", date: "Jul 2",  slotA: "1B",        slotB: "3:EFGIJ" },
+  { id: "R32_14", date: "Jul 3",  slotA: "1J",        slotB: "2H" },
+  { id: "R32_15", date: "Jul 3",  slotA: "1K",        slotB: "3:DEIJL" },
+  { id: "R32_16", date: "Jul 3",  slotA: "2D",        slotB: "2G" },
+];
+
+// Round of 16: official 2026 bracket wiring (FIFA matches 89-96).
+// R32_n corresponds to FIFA match (72+n), i.e. R32_1=M73 ... R32_16=M88.
+// Ordered so the existing QF/SF code reproduces FIFA's two halves of the draw.
+const R16 = [
+  { id: "R16_1", date: "Jul 4", src: ["R32_2",  "R32_5"]  }, // M89: W74 v W77
+  { id: "R16_2", date: "Jul 4", src: ["R32_1",  "R32_3"]  }, // M90: W73 v W75
+  { id: "R16_3", date: "Jul 6", src: ["R32_11", "R32_12"] }, // M93: W83 v W84
+  { id: "R16_4", date: "Jul 6", src: ["R32_9",  "R32_10"] }, // M94: W81 v W82
+  { id: "R16_5", date: "Jul 5", src: ["R32_4",  "R32_6"]  }, // M91: W76 v W78
+  { id: "R16_6", date: "Jul 5", src: ["R32_7",  "R32_8"]  }, // M92: W79 v W80
+  { id: "R16_7", date: "Jul 7", src: ["R32_14", "R32_16"] }, // M95: W86 v W88
+  { id: "R16_8", date: "Jul 7", src: ["R32_13", "R32_15"] }, // M96: W85 v W87
+];
+
+const QF = [
+  { id: "QF_1", date: "Jul 9",  src: ["R16_1", "R16_2"] },
+  { id: "QF_2", date: "Jul 10", src: ["R16_3", "R16_4"] },
+  { id: "QF_3", date: "Jul 11", src: ["R16_5", "R16_6"] },
+  { id: "QF_4", date: "Jul 11", src: ["R16_7", "R16_8"] },
+];
+
+const SF = [
+  { id: "SF_1", date: "Jul 14", src: ["QF_1", "QF_2"] },
+  { id: "SF_2", date: "Jul 15", src: ["QF_3", "QF_4"] },
+];
+
+const THIRD_PLACE = { id: "TP", date: "Jul 18", loserOf: ["SF_1","SF_2"] };
+const FINAL = { id: "F", date: "Jul 19", src: ["SF_1","SF_2"] };
+
+/* ============================================================
+   PREDICTION MODEL
+   ============================================================ */
+
+// Weights for the composite base (must sum to 1). Three signals:
+//  - odds: the betting market, sharpest single predictor
+//  - sv  : squad market value — objective, player-based available quality
+//  - rank: FIFA ranking, keeps the lower half of the field well-separated
+const W_ODDS = 0.45;   // sportsbook odds
+const W_SV   = 0.30;   // squad market value (player-based)
+const W_RANK = 0.25;   // FIFA ranking
+const W_PED  = 0.8;    // power-points per pedigree point (max +8)
+const HOST_BONUS = 4;  // power-points for host nations
+
+// Min-max normalise a {id:value} map onto 0-100.
+function normaliseMap(obj) {
+  const vals = Object.values(obj);
+  const mn = Math.min(...vals), mx = Math.max(...vals);
+  const out = {};
+  for (const k in obj) out[k] = (mx === mn) ? 50 : 100 * (obj[k] - mn) / (mx - mn);
+  return out;
+}
+
+// Precompute a strength rating per team once (TEAMS is static).
+const STRENGTH = (function buildStrengths() {
+  const ids = Object.keys(TEAMS);
+  // Odds and squad value are both heavy-tailed → use log before normalising.
+  const logOdds = {}, logSv = {}, rankPow = {};
+  ids.forEach(id => {
+    logOdds[id] = Math.log(TEAMS[id].odds);
+    logSv[id]   = Math.log(TEAMS[id].sv);
+    rankPow[id] = 100 - TEAMS[id].rank;
+  });
+  const oN = normaliseMap(logOdds);   // 0-100 from odds
+  const vN = normaliseMap(logSv);     // 0-100 from squad value
+  const rN = normaliseMap(rankPow);   // 0-100 from FIFA rank
+  const S = {};
+  ids.forEach(id => {
+    const t = TEAMS[id];
+    let s = W_ODDS * oN[id] + W_SV * vN[id] + W_RANK * rN[id];
+    s += (t.ped || 0) * W_PED;       // pedigree
+    s += t.host ? HOST_BONUS : 0;    // host advantage
+    s += (t.form || 0);              // warm-up / recent form nudge
+    s -= (t.inj || 0);               // injury penalty (small — see note above)
+    S[id] = Math.max(1, s);
+  });
+  return S;
+})();
+
+// Implied title probability (de-vigged) for display in the Model tab.
+const IMPLIED_PCT = (function deVig() {
+  const ids = Object.keys(TEAMS);
+  const total = ids.reduce((sum, id) => sum + TEAMS[id].odds, 0);
+  const P = {};
+  ids.forEach(id => P[id] = TEAMS[id].odds / total);
+  return P;
+})();
+
+function strength(teamId) { return STRENGTH[teamId]; }
+
+function predictScore(homeId, awayId) {
+  const sA = strength(homeId);
+  const sB = strength(awayId);
+  const diff = sA - sB; // positive = home stronger
+  const baseGoals = 1.2;
+  let gA = baseGoals + (diff > 0 ? diff * 0.022 : diff * 0.011);
+  let gB = baseGoals + (diff < 0 ? -diff * 0.022 : -diff * 0.011);
+  gA = Math.max(0, Math.round(gA));
+  gB = Math.max(0, Math.round(gB));
+  return [gA, gB];
+}
+
+// Knockout: if the predicted normal-time score is a draw, the stronger team
+// advances on penalties.
+function predictKnockoutWinner(homeId, awayId) {
+  const [hg, ag] = predictScore(homeId, awayId);
+  if (hg !== ag) {
+    return { hg, ag, winner: hg > ag ? homeId : awayId, pens: false };
+  }
+  // Draw → stronger team wins on penalties
+  const winner = strength(homeId) >= strength(awayId) ? homeId : awayId;
+  return { hg, ag, winner, pens: true };
+}
+
+/* ============================================================
+   STATE: actual scores stored in localStorage
+   actualScores[matchId] = { hg, ag, winner?: teamId }   (winner only for KO draws)
+   ============================================================ */
+
+const STATE_KEY = "wc2026.actualScores.v1";
+let actualScores = JSON.parse(localStorage.getItem(STATE_KEY) || "{}");
+
+// Auto-filled official results from results.json (maintained by the cloud job).
+// Precedence: a manual entry always wins over the auto-fill, so you can correct it.
+let officialResults = {};
+let officialMeta = { updated: null };
+function getActual(id) { return actualScores[id] || officialResults[id]; }
+function isAuto(id) { return !actualScores[id] && !!officialResults[id]; }
+
+function saveState() {
+  localStorage.setItem(STATE_KEY, JSON.stringify(actualScores));
+}
+function setActual(matchId, field, value) {
+  if (!actualScores[matchId]) actualScores[matchId] = {};
+  if (value === "" || value === null) {
+    delete actualScores[matchId][field];
+    if (Object.keys(actualScores[matchId]).length === 0) delete actualScores[matchId];
+  } else {
+    actualScores[matchId][field] = value;
+  }
+  saveState();
+  render();
+}
+function resetAll() {
+  if (!confirm("Reset all entered actual scores?")) return;
+  actualScores = {};
+  saveState();
+  render();
+}
+function exportData() {
+  const blob = new Blob([JSON.stringify(actualScores, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "wc2026-actuals.json"; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    let data;
+    try {
+      data = JSON.parse(e.target.result);
+    } catch (err) {
+      alert("Could not read that file — it isn't valid JSON.\n\n" + err.message);
+      return;
+    }
+    if (typeof data !== "object" || data === null || Array.isArray(data)) {
+      alert("That doesn't look like a World Cup results file.");
+      return;
+    }
+    // Light validation: keep only entries shaped like { hg, ag, winner? }
+    const clean = {};
+    let skipped = 0;
+    for (const [id, v] of Object.entries(data)) {
+      if (v && typeof v === "object" && v.hg != null && v.ag != null) {
+        const entry = { hg: +v.hg, ag: +v.ag };
+        if (v.winner) entry.winner = v.winner;
+        clean[id] = entry;
+      } else { skipped++; }
+    }
+    const count = Object.keys(clean).length;
+    if (count === 0) { alert("No valid results found in that file."); return; }
+    const existing = Object.keys(actualScores).length;
+    const msg = (existing > 0
+      ? `Import ${count} result(s)? This REPLACES your current ${existing} entered result(s).`
+      : `Import ${count} result(s)?`)
+      + (skipped ? `\n(${skipped} unrecognised entr${skipped===1?"y":"ies"} skipped.)` : "");
+    if (!confirm(msg)) return;
+    actualScores = clean;
+    saveState();
+    render();
+  };
+  reader.readAsText(file);
+  event.target.value = ""; // reset so the same file can be re-imported later
+}
+
+// Effective score: prefer actual, otherwise predicted
+function effectiveGroupScore(fix) {
+  const a = getActual(fix.id);
+  const pred = predictScore(fix.home, fix.away);
+  if (a && a.hg != null && a.ag != null) {
+    return { hg: +a.hg, ag: +a.ag, isActual: true };
+  }
+  return { hg: pred[0], ag: pred[1], isActual: false };
+}
+
+/* ============================================================
+   STANDINGS COMPUTATION
+   ============================================================ */
+
+function computeGroupStandings(groupLetter) {
+  const teams = GROUPS[groupLetter];
+  const stats = {};
+  teams.forEach(t => stats[t] = { team: t, P:0, W:0, D:0, L:0, GF:0, GA:0, GD:0, Pts:0 });
+  const fixtures = GROUP_FIXTURES.filter(f => f.group === groupLetter);
+  for (const fix of fixtures) {
+    const { hg, ag } = effectiveGroupScore(fix);
+    const h = stats[fix.home], a = stats[fix.away];
+    h.P++; a.P++;
+    h.GF += hg; h.GA += ag; h.GD = h.GF - h.GA;
+    a.GF += ag; a.GA += hg; a.GD = a.GF - a.GA;
+    if (hg > ag) { h.W++; a.L++; h.Pts += 3; }
+    else if (hg < ag) { a.W++; h.L++; a.Pts += 3; }
+    else { h.D++; a.D++; h.Pts++; a.Pts++; }
+  }
+  // Sort: Pts → GD → GF → FIFA rank (lower = better)
+  const arr = Object.values(stats).sort((x, y) => {
+    if (y.Pts !== x.Pts) return y.Pts - x.Pts;
+    if (y.GD !== x.GD) return y.GD - x.GD;
+    if (y.GF !== x.GF) return y.GF - x.GF;
+    return TEAMS[x.team].rank - TEAMS[y.team].rank;
+  });
+  return arr;
+}
+
+function allGroupStandings() {
+  const map = {};
+  for (const g of Object.keys(GROUPS)) map[g] = computeGroupStandings(g);
+  return map;
+}
+
+// Best 8 third-placed teams across all groups
+function bestThirdPlaces(standings) {
+  const thirds = [];
+  for (const [g, table] of Object.entries(standings)) {
+    thirds.push({ ...table[2], group: g });
+  }
+  thirds.sort((x, y) => {
+    if (y.Pts !== x.Pts) return y.Pts - x.Pts;
+    if (y.GD !== x.GD) return y.GD - x.GD;
+    if (y.GF !== x.GF) return y.GF - x.GF;
+    return TEAMS[x.team].rank - TEAMS[y.team].rank;
+  });
+  return thirds; // first 8 qualify
+}
+
+/* ============================================================
+   RESOLVE BRACKET PLACEHOLDERS
+   ============================================================ */
+
+function resolveSlot(slot, standings, qualifiedThirds) {
+  // "1A", "2B" etc.
+  if (/^[12][A-L]$/.test(slot)) {
+    const pos = +slot[0] - 1;
+    const g = slot[1];
+    return standings[g][pos].team;
+  }
+  // "3:ABCDF" — pick the best qualifying 3rd from listed groups
+  if (slot.startsWith("3:")) {
+    const allowed = slot.slice(2).split("");
+    for (const t of qualifiedThirds) {
+      if (allowed.includes(t.group)) return t.team;
+    }
+    // Fallback (should not happen if all 8 qualify normally)
+    return qualifiedThirds[0]?.team;
+  }
+  return null;
+}
+
+// Returns the list of R32 matches with resolved teams
+function resolveR32() {
+  const standings = allGroupStandings();
+  const thirds = bestThirdPlaces(standings);
+  const qualifiedThirds = thirds.slice(0, 8);
+  // Track which 3rd-place teams have been used so each only fills one slot
+  const used = new Set();
+  function pickThird(allowed) {
+    for (const t of qualifiedThirds) {
+      if (used.has(t.team)) continue;
+      if (allowed.includes(t.group)) {
+        used.add(t.team);
+        return t.team;
+      }
+    }
+    // Fallback: any unused qualified 3rd
+    for (const t of qualifiedThirds) {
+      if (!used.has(t.team)) { used.add(t.team); return t.team; }
+    }
+    return null;
+  }
+  return R32.map(m => {
+    const a = /^3:/.test(m.slotA) ? pickThird(m.slotA.slice(2).split("")) : resolveSlot(m.slotA, standings, qualifiedThirds);
+    const b = /^3:/.test(m.slotB) ? pickThird(m.slotB.slice(2).split("")) : resolveSlot(m.slotB, standings, qualifiedThirds);
+    return { ...m, home: a, away: b };
+  });
+}
+
+// Resolve any KO match's winner using actual if set, else prediction
+function getKoResult(matchId, homeId, awayId) {
+  if (!homeId || !awayId) return null;
+  const a = getActual(matchId);
+  if (a && a.hg != null && a.ag != null) {
+    const hg = +a.hg, ag = +a.ag;
+    if (hg !== ag) {
+      return { hg, ag, winner: hg > ag ? homeId : awayId, pens: false, isActual: true };
+    }
+    // Draw → user must specify winner (penalty shootout result)
+    const winner = a.winner || (strength(homeId) >= strength(awayId) ? homeId : awayId);
+    return { hg, ag, winner, pens: true, isActual: true, userPickedWinner: !!a.winner };
+  }
+  const pred = predictKnockoutWinner(homeId, awayId);
+  return { ...pred, isActual: false };
+}
+
+function resolveAllKnockout() {
+  const r32 = resolveR32();
+  const r32Results = {};
+  r32.forEach(m => {
+    r32Results[m.id] = { match: m, result: getKoResult(m.id, m.home, m.away) };
+  });
+
+  function pickWinner(matchId, results) {
+    const r = results[matchId];
+    return r?.result?.winner || null;
+  }
+
+  const r16 = R16.map(m => ({
+    ...m,
+    home: pickWinner(m.src[0], r32Results),
+    away: pickWinner(m.src[1], r32Results),
+  }));
+  const r16Results = {};
+  r16.forEach(m => {
+    r16Results[m.id] = { match: m, result: getKoResult(m.id, m.home, m.away) };
+  });
+
+  const qf = QF.map(m => ({
+    ...m,
+    home: pickWinner(m.src[0], r16Results),
+    away: pickWinner(m.src[1], r16Results),
+  }));
+  const qfResults = {};
+  qf.forEach(m => {
+    qfResults[m.id] = { match: m, result: getKoResult(m.id, m.home, m.away) };
+  });
+
+  const sf = SF.map(m => ({
+    ...m,
+    home: pickWinner(m.src[0], qfResults),
+    away: pickWinner(m.src[1], qfResults),
+  }));
+  const sfResults = {};
+  sf.forEach(m => {
+    sfResults[m.id] = { match: m, result: getKoResult(m.id, m.home, m.away) };
+  });
+
+  function loserOf(matchId, results) {
+    const r = results[matchId];
+    if (!r?.match.home || !r?.match.away) return null;
+    return r.result?.winner === r.match.home ? r.match.away : r.match.home;
+  }
+
+  const tp = {
+    ...THIRD_PLACE,
+    home: loserOf("SF_1", sfResults),
+    away: loserOf("SF_2", sfResults),
+  };
+  tp.resolved = getKoResult(tp.id, tp.home, tp.away);
+
+  const final = {
+    ...FINAL,
+    home: pickWinner("SF_1", sfResults),
+    away: pickWinner("SF_2", sfResults),
+  };
+  final.resolved = getKoResult(final.id, final.home, final.away);
+
+  return { r32: r32Results, r16: r16Results, qf: qfResults, sf: sfResults, tp, final };
+}
+
+/* ============================================================
+   RENDERING
+   ============================================================ */
+
+let currentTab = "groups";
+
+function switchTab(t) {
+  currentTab = t;
+  document.querySelectorAll("nav button").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab === t);
+  });
+  render();
+}
+
+function teamHtml(id, side="") {
+  if (!id) return `<span class="team-name ${side}"><span class="tbd">TBD</span></span>`;
+  const t = TEAMS[id];
+  if (side === "home") {
+    return `<span class="team-name home">${t.name} <span class="flag">${t.flag}</span></span>`;
+  }
+  return `<span class="team-name away"><span class="flag">${t.flag}</span> ${t.name}</span>`;
+}
+
+function renderGroupCard(letter) {
+  const teams = GROUPS[letter];
+  const standings = computeGroupStandings(letter);
+  const fixtures = GROUP_FIXTURES.filter(f => f.group === letter);
+
+  const rows = standings.map((s, i) => {
+    let cls = "out";
+    if (i === 0) cls = "q1";
+    else if (i === 1) cls = "q2";
+    else if (i === 2) cls = "q3";
+    const t = TEAMS[s.team];
+    return `<tr class="${cls}">
+      <td class="team"><span class="pos-badge">${i+1}</span><span class="flag">${t.flag}</span> ${t.name}</td>
+      <td>${s.P}</td><td>${s.W}</td><td>${s.D}</td><td>${s.L}</td>
+      <td>${s.GF}</td><td>${s.GA}</td><td>${s.GD > 0 ? "+"+s.GD : s.GD}</td>
+      <td><strong>${s.Pts}</strong></td>
+    </tr>`;
+  }).join("");
+
+  const matches = fixtures.map(fix => {
+    const pred = predictScore(fix.home, fix.away);
+    const a = getActual(fix.id) || {};
+    const confirmed = (a.hg != null && a.ag != null);
+    return `<div class="match ${confirmed ? "confirmed" : ""}">
+      <div class="team-name home">${TEAMS[fix.home].name} <span class="flag">${TEAMS[fix.home].flag}</span></div>
+      <div class="score-block">
+        <div class="date">${fix.date}</div>
+        <div class="predicted">pred ${pred[0]}–${pred[1]}</div>
+        <div class="actual-row">
+          <input type="number" min="0" max="20" value="${a.hg ?? ""}" placeholder="-" onchange="setActual('${fix.id}','hg',this.value)" />
+          <span class="vs">–</span>
+          <input type="number" min="0" max="20" value="${a.ag ?? ""}" placeholder="-" onchange="setActual('${fix.id}','ag',this.value)" />
+        </div>
+      </div>
+      <div class="team-name away"><span class="flag">${TEAMS[fix.away].flag}</span> ${TEAMS[fix.away].name}</div>
+    </div>`;
+  }).join("");
+
+  return `<div class="group-card">
+    <div class="group-header">
+      <div class="group-title">Group ${letter}</div>
+    </div>
+    <table class="standings">
+      <thead><tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div>${matches}</div>
+  </div>`;
+}
+
+function renderGroupsTab() {
+  const cards = Object.keys(GROUPS).map(renderGroupCard).join("");
+  const standings = allGroupStandings();
+  const thirds = bestThirdPlaces(standings);
+  const thirdRows = thirds.map((t, i) => {
+    const cls = i < 8 ? "qual" : "out";
+    const team = TEAMS[t.team];
+    return `<tr class="${cls}">
+      <td>${i+1}</td>
+      <td>${t.group}</td>
+      <td><span class="flag">${team.flag}</span> ${team.name}</td>
+      <td>${t.Pts}</td><td>${t.GD > 0 ? "+"+t.GD : t.GD}</td><td>${t.GF}</td>
+      <td>${i < 8 ? "Qualified" : "Eliminated"}</td>
+    </tr>`;
+  }).join("");
+
+  return `
+    <div class="legend">
+      <span class="l1">1st &amp; 2nd → R32</span>
+      <span class="l3">3rd → best 8 advance</span>
+      <span class="lo">4th eliminated</span>
+    </div>
+    <div class="groups-grid">${cards}</div>
+    <h2>Third-place ranking (best 8 advance)</h2>
+    <div class="third-places">
+      <table>
+        <thead><tr><th>#</th><th>Grp</th><th>Team</th><th>Pts</th><th>GD</th><th>GF</th><th>Status</th></tr></thead>
+        <tbody>${thirdRows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderKoMatch(m, label, resolution) {
+  const res = resolution; // may be null
+  const a = getActual(m.id) || {};
+  const confirmed = (a.hg != null && a.ag != null);
+  const home = m.home, away = m.away;
+  const homeT = home ? TEAMS[home] : null;
+  const awayT = away ? TEAMS[away] : null;
+
+  const predLine = home && away
+    ? `pred ${res?.hg ?? "-"}–${res?.ag ?? "-"}${res?.pens && !res?.isActual ? ` (${TEAMS[res.winner].name} pens)` : ""}`
+    : "pred TBD";
+
+  const inputs = home && away
+    ? `<div class="actual-row">
+        <input type="number" min="0" max="20" value="${a.hg ?? ""}" placeholder="-" onchange="setActual('${m.id}','hg',this.value)" />
+        <span class="vs">–</span>
+        <input type="number" min="0" max="20" value="${a.ag ?? ""}" placeholder="-" onchange="setActual('${m.id}','ag',this.value)" />
+      </div>`
+    : `<div class="actual-row"><span class="tbd">awaiting results</span></div>`;
+
+  // Penalty winner selector if actual is a draw
+  let penRow = "";
+  if (home && away && a.hg != null && a.ag != null && +a.hg === +a.ag) {
+    penRow = `<div class="pen-row">Draw — winner on pens:
+      <select onchange="setActual('${m.id}','winner', this.value || null)">
+        <option value="">— pick —</option>
+        <option value="${home}" ${a.winner === home ? "selected" : ""}>${homeT.name}</option>
+        <option value="${away}" ${a.winner === away ? "selected" : ""}>${awayT.name}</option>
+      </select>
+    </div>`;
+  } else if (!res?.isActual && res?.pens) {
+    // predicted pens
+    penRow = `<div class="pen-row">predicted draw — ${TEAMS[res.winner].name} on pens</div>`;
+  }
+
+  return `<div class="ko-match ${confirmed ? "confirmed" : ""}">
+    <div class="ko-header"><span>${label}</span><span>${m.date}</span></div>
+    <div class="ko-teams">
+      <div class="team-name home">${home ? homeT.name : "<span class='tbd'>TBD</span>"} ${home ? `<span class="flag">${homeT.flag}</span>` : ""}</div>
+      <div class="score-block">
+        <div class="predicted">${predLine}</div>
+        ${inputs}
+      </div>
+      <div class="team-name away">${away ? `<span class="flag">${awayT.flag}</span>` : ""} ${away ? awayT.name : "<span class='tbd'>TBD</span>"}</div>
+    </div>
+    ${penRow}
+  </div>`;
+}
+
+function renderKnockoutTab() {
+  const all = resolveAllKnockout();
+
+  const r32Cards = R32.map((m, i) => {
+    const r = all.r32[m.id];
+    return renderKoMatch(r.match, `R32 · M${73+i}`, r.result);
+  }).join("");
+
+  const r16Cards = R16.map((m, i) => {
+    const r = all.r16[m.id];
+    return renderKoMatch(r.match, `R16 · M${89+i}`, r.result);
+  }).join("");
+
+  const qfCards = QF.map((m, i) => {
+    const r = all.qf[m.id];
+    return renderKoMatch(r.match, `QF · M${97+i}`, r.result);
+  }).join("");
+
+  const sfCards = SF.map((m, i) => {
+    const r = all.sf[m.id];
+    return renderKoMatch(r.match, `SF · M${101+i}`, r.result);
+  }).join("");
+
+  const tpCard = renderKoMatch(all.tp, "3rd-place playoff · M103", all.tp.resolved);
+  const finalCard = renderKoMatch(all.final, "FINAL · M104", all.final.resolved);
+
+  return `
+    <div class="ko-section"><h2>Round of 32</h2><div class="ko-grid">${r32Cards}</div></div>
+    <div class="ko-section"><h2>Round of 16</h2><div class="ko-grid">${r16Cards}</div></div>
+    <div class="ko-section"><h2>Quarterfinals</h2><div class="ko-grid">${qfCards}</div></div>
+    <div class="ko-section"><h2>Semifinals</h2><div class="ko-grid">${sfCards}</div></div>
+    <div class="ko-section"><h2>Third-place playoff</h2><div class="ko-grid">${tpCard}</div></div>
+    <div class="ko-section"><h2>Final</h2><div class="ko-grid">${finalCard}</div></div>
+  `;
+}
+
+function renderModelTab() {
+  const ids = Object.keys(TEAMS).sort((a, b) => strength(b) - strength(a));
+  const maxS = Math.max(...ids.map(strength));
+  const rows = ids.map((id, i) => {
+    const t = TEAMS[id];
+    const s = strength(id);
+    const pct = (IMPLIED_PCT[id] * 100);
+    const pctStr = pct >= 1 ? pct.toFixed(1) + "%" : pct.toFixed(2) + "%";
+    const svStr = t.sv >= 1000 ? `£${(t.sv/1000).toFixed(2)}bn` : `£${t.sv}m`;
+    const barW = Math.round(100 * s / maxS);
+    const flags = [];
+    if (t.inj) flags.push(`<span style="color:var(--bad)">−${t.inj} inj</span>`);
+    if (t.form) flags.push(`<span style="color:var(--${t.form > 0 ? 'good' : 'bad'})">${t.form > 0 ? '+' : ''}${t.form} form</span>`);
+    if (t.host) flags.push(`<span style="color:var(--accent)">host</span>`);
+    return `<tr>
+      <td>${i + 1}</td>
+      <td class="team"><span class="flag">${t.flag}</span> ${t.name}</td>
+      <td>#${t.rank}</td>
+      <td>${pctStr}</td>
+      <td>${svStr}</td>
+      <td>${t.ped}/10</td>
+      <td style="font-size:11px;color:var(--muted)">${flags.join(" · ") || "—"}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1;background:var(--bg);border-radius:3px;height:8px;min-width:80px">
+            <div style="width:${barW}%;background:var(--accent);height:8px;border-radius:3px"></div>
+          </div>
+          <strong>${s.toFixed(1)}</strong>
+        </div>
+      </td>
+      <td style="font-size:11px;color:var(--muted)">${t.note || ""}</td>
+    </tr>`;
+  }).join("");
+
+  return `
+    <h2>How predictions are calculated</h2>
+    <div class="third-places" style="font-size:13px;color:var(--muted);line-height:1.6">
+      Each team gets a <strong style="color:var(--text)">power rating</strong> (higher = stronger) blending three signals:
+      <strong style="color:var(--text)">bookmaker odds (45%)</strong> — the sharpest single predictor —
+      <strong style="color:var(--text)">squad market value (30%)</strong>, an objective player-based measure of available quality (Transfermarkt, final 26-man squads),
+      and <strong style="color:var(--text)">FIFA ranking (25%)</strong> to keep the lower half of the field separated.
+      On top of that: <strong style="color:var(--text)">pedigree</strong> (up to +8), <strong style="color:var(--text)">host bonus</strong> (+4),
+      <strong style="color:var(--text)">warm-up form</strong> nudges (friendlies to Jun 7), and small <strong style="color:var(--text)">injury</strong> penalties.
+      A match score comes from the rating gap; in knockouts a predicted draw is decided on penalties by the higher-rated side.
+      <br><br>
+      <em>Injury penalties are deliberately small: squad value already reflects the selected (post-injury) 26-man squad, and odds price injuries in,
+      so a big penalty would double-count. The <strong style="color:var(--text)">Notes</strong> column lists each team's key absences in full.
+      All data is a June 7, 2026 snapshot; the twice-daily task keeps it current until kickoff.</em>
+    </div>
+    <h2>Power ratings — all 48 teams</h2>
+    <div class="third-places">
+      <table>
+        <thead><tr><th>#</th><th>Team</th><th>FIFA</th><th>Title&nbsp;%</th><th>Squad&nbsp;£</th><th>Pedigree</th><th>Adj.</th><th>Power rating</th><th>Notes</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function render() {
+  const total = 104;
+  const allIds = new Set([...Object.keys(actualScores), ...Object.keys(officialResults)]);
+  let entered = 0, auto = 0;
+  for (const k of allIds) {
+    const a = getActual(k);
+    if (a && a.hg != null && a.ag != null) { entered++; if (isAuto(k)) auto++; }
+  }
+  const autoTxt = auto ? ` · ${auto} auto-filled` : "";
+  document.getElementById("stats").textContent = `${entered}/${total} results in${autoTxt}`;
+
+  const content = document.getElementById("content");
+  if (currentTab === "groups") {
+    content.innerHTML = renderGroupsTab();
+  } else if (currentTab === "knockout") {
+    content.innerHTML = renderKnockoutTab();
+  } else {
+    content.innerHTML = renderModelTab();
+  }
+}
+
+/* ============================================================
+   AUTO-FILL: official results from results.json (cloud job)
+   results.json = { "updated": "...", "matches": [ {home,away,hg,ag,winner?}, ... ] }
+   Team names are matched to codes; group games map by team pair,
+   knockout games map by cascading through the resolved bracket.
+   ============================================================ */
+
+const NAME2CODE = (function () {
+  const norm = s => (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]/g, "");
+  const map = {};
+  for (const code in TEAMS) map[norm(TEAMS[code].name)] = code;
+  // External-source name variants → our codes
+  const alias = {
+    usa: "USA", us: "USA", unitedstatesofamerica: "USA",
+    korearepublic: "KOR", republicofkorea: "KOR", korea: "KOR",
+    turkey: "TUR", bosniaandherzegovina: "BIH", bosnia: "BIH",
+    cotedivoire: "CIV", caboverde: "CPV", czechrepublic: "CZE",
+    drcongo: "COD", congodr: "COD", democraticrepublicofthecongo: "COD",
+    holland: "NED", iririran: "IRN"
+  };
+  for (const k in alias) map[k] = alias[k];
+  return { map, norm };
+})();
+function codeFromName(s) { return NAME2CODE.map[NAME2CODE.norm(s)]; }
+
+function koSlots(all) {
+  const out = [];
+  ["r32", "r16", "qf", "sf"].forEach(round => {
+    const grp = all[round]; if (!grp) return;
+    for (const id in grp) { const mm = grp[id].match; if (mm) out.push([id, mm.home, mm.away]); }
+  });
+  if (all.final) out.push([FINAL.id, all.final.home, all.final.away]);
+  if (all.tp) out.push([THIRD_PLACE.id, all.tp.home, all.tp.away]);
+  return out;
+}
+
+function applyOfficialResults(list) {
+  try {
+    officialResults = {};
+    if (!Array.isArray(list)) return;
+    const parsed = list.map(mt => {
+      const cH = codeFromName(mt.home), cA = codeFromName(mt.away);
+      if (!cH || !cA || mt.hg == null || mt.ag == null) return null;
+      return { cH, cA, hg: +mt.hg, ag: +mt.ag, winner: mt.winner ? codeFromName(mt.winner) : null, used: false };
+    }).filter(Boolean);
+
+    // 1) Group games — unique team pair maps straight to a fixture
+    for (const fix of GROUP_FIXTURES) {
+      const m = parsed.find(p => !p.used &&
+        ((p.cH === fix.home && p.cA === fix.away) || (p.cH === fix.away && p.cA === fix.home)));
+      if (!m) continue;
+      m.used = true;
+      officialResults[fix.id] = (m.cH === fix.home) ? { hg: m.hg, ag: m.ag } : { hg: m.ag, ag: m.hg };
+    }
+
+    // 2) Knockout games — resolve bracket, match remaining results to slots, repeat
+    for (let pass = 0; pass < 7; pass++) {
+      let all, changed = false;
+      try { all = resolveAllKnockout(); } catch (e) { break; }
+      for (const [id, home, away] of koSlots(all)) {
+        if (officialResults[id] || !home || !away) continue;
+        const m = parsed.find(p => !p.used &&
+          ((p.cH === home && p.cA === away) || (p.cH === away && p.cA === home)));
+        if (!m) continue;
+        m.used = true; changed = true;
+        const ent = (m.cH === home) ? { hg: m.hg, ag: m.ag } : { hg: m.ag, ag: m.hg };
+        if (ent.hg === ent.ag && m.winner) ent.winner = m.winner; // penalty result
+        officialResults[id] = ent;
+      }
+      if (!changed) break;
+    }
+  } catch (e) { officialResults = officialResults || {}; }
+}
+
+function loadOfficialResults() {
+  fetch("results.json?ts=" + Date.now())
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data) return;
+      const list = Array.isArray(data) ? data : (data.matches || []);
+      officialMeta.updated = data.updated || null;
+      applyOfficialResults(list);
+      render();
+    })
+    .catch(() => {}); // no results.json (e.g. before tournament / file://) → ignore
+}
+
+render();
+loadOfficialResults();
+setInterval(loadOfficialResults, 5 * 60 * 1000); // refresh real scores every 5 min while open
+</script>
+</body>
+</html>
