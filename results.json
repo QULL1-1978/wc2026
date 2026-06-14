@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-14T18:43:20.730Z",
+  "updated": "2026-06-14T22:55:19.387Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -49,6 +49,18 @@
       "away": "Turkey",
       "hg": 2,
       "ag": 0
+    },
+    {
+      "home": "Germany",
+      "away": "Curaçao",
+      "hg": 7,
+      "ag": 1
+    },
+    {
+      "home": "Netherlands",
+      "away": "Japan",
+      "hg": 2,
+      "ag": 2
     }
   ]
 }
