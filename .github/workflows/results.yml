@@ -6,7 +6,8 @@ name: Fetch World Cup results
 
 on:
   schedule:
-    - cron: "*/30 * * * *" # every 30 minutes (UTC)
+    # Every ~15 min, OFF the :00/:30 marks (GitHub deprioritises those, causing long gaps)
+    - cron: "9,24,39,54 * * * *"
   workflow_dispatch: {} # lets you run it manually from the Actions tab
 
 permissions:
