@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-15T14:43:31.684Z",
+  "updated": "2026-06-15T23:09:50.917Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -72,6 +72,18 @@
       "home": "Sweden",
       "away": "Tunisia",
       "hg": 5,
+      "ag": 1
+    },
+    {
+      "home": "Spain",
+      "away": "Cape Verde Islands",
+      "hg": 0,
+      "ag": 0
+    },
+    {
+      "home": "Belgium",
+      "away": "Egypt",
+      "hg": 1,
       "ag": 1
     }
   ]
