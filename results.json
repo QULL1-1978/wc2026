@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-14T22:55:19.387Z",
+  "updated": "2026-06-15T14:43:31.684Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -61,6 +61,18 @@
       "away": "Japan",
       "hg": 2,
       "ag": 2
+    },
+    {
+      "home": "Ivory Coast",
+      "away": "Ecuador",
+      "hg": 1,
+      "ag": 0
+    },
+    {
+      "home": "Sweden",
+      "away": "Tunisia",
+      "hg": 5,
+      "ag": 1
     }
   ]
 }
