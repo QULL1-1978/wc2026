@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
 <title>FIFA World Cup 2026 — Predictions Tracker</title>
 <style>
   :root {
@@ -91,7 +93,8 @@
     font-size: 13px;
   }
   .match:last-child { border-bottom: none; }
-  .match .team-name { display: flex; align-items: center; gap: 6px; }
+  .match .team-name { display: flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+  .match .flag { flex: none; }
   .match .home { justify-content: flex-end; text-align: right; }
   .match .away { justify-content: flex-start; text-align: left; }
   .match .score-block { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 110px; }
