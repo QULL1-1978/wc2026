@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-16T18:13:48.688Z",
+  "updated": "2026-06-16T23:53:45.492Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -97,6 +97,12 @@
       "away": "New Zealand",
       "hg": 2,
       "ag": 2
+    },
+    {
+      "home": "France",
+      "away": "Senegal",
+      "hg": 3,
+      "ag": 1
     }
   ]
 }
