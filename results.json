@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-21T22:02:12.042Z",
+  "updated": "2026-06-22T16:16:06.534Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -229,6 +229,18 @@
       "away": "Iran",
       "hg": 0,
       "ag": 0
+    },
+    {
+      "home": "Uruguay",
+      "away": "Cape Verde Islands",
+      "hg": 2,
+      "ag": 2
+    },
+    {
+      "home": "New Zealand",
+      "away": "Egypt",
+      "hg": 1,
+      "ag": 3
     }
   ]
 }
