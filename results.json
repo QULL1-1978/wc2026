@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-22T22:28:02.348Z",
+  "updated": "2026-06-23T10:49:17.866Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -247,6 +247,24 @@
       "away": "Austria",
       "hg": 2,
       "ag": 0
+    },
+    {
+      "home": "France",
+      "away": "Iraq",
+      "hg": 3,
+      "ag": 0
+    },
+    {
+      "home": "Norway",
+      "away": "Senegal",
+      "hg": 3,
+      "ag": 2
+    },
+    {
+      "home": "Jordan",
+      "away": "Algeria",
+      "hg": 1,
+      "ag": 2
     }
   ]
 }
