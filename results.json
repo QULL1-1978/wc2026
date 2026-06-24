@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-24T17:32:15.480Z",
+  "updated": "2026-06-24T22:02:55.574Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -289,6 +289,18 @@
       "away": "Congo DR",
       "hg": 1,
       "ag": 0
+    },
+    {
+      "home": "Switzerland",
+      "away": "Canada",
+      "hg": 2,
+      "ag": 1
+    },
+    {
+      "home": "Bosnia-Herzegovina",
+      "away": "Qatar",
+      "hg": 3,
+      "ag": 1
     }
   ]
 }
