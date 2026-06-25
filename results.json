@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-25T17:34:04.367Z",
+  "updated": "2026-06-25T23:00:27.969Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -12,12 +12,6 @@
       "home": "South Korea",
       "away": "Czechia",
       "hg": 2,
-      "ag": 1
-    },
-    {
-      "home": "Canada",
-      "away": "Bosnia-Herzegovina",
-      "hg": 1,
       "ag": 1
     },
     {
@@ -325,6 +319,18 @@
       "away": "South Korea",
       "hg": 1,
       "ag": 0
+    },
+    {
+      "home": "Ecuador",
+      "away": "Germany",
+      "hg": 2,
+      "ag": 1
+    },
+    {
+      "home": "Curaçao",
+      "away": "Ivory Coast",
+      "hg": 0,
+      "ag": 2
     }
   ]
 }
