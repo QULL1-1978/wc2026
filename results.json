@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-24T22:02:55.574Z",
+  "updated": "2026-06-25T10:21:07.005Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -301,6 +301,30 @@
       "away": "Qatar",
       "hg": 3,
       "ag": 1
+    },
+    {
+      "home": "Morocco",
+      "away": "Haiti",
+      "hg": 4,
+      "ag": 2
+    },
+    {
+      "home": "Scotland",
+      "away": "Brazil",
+      "hg": 0,
+      "ag": 3
+    },
+    {
+      "home": "Czechia",
+      "away": "Mexico",
+      "hg": 0,
+      "ag": 3
+    },
+    {
+      "home": "South Africa",
+      "away": "South Korea",
+      "hg": 1,
+      "ag": 0
     }
   ]
 }
