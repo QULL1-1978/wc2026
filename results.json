@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-28T20:44:24.792Z",
+  "updated": "2026-06-29T12:49:22.716Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -433,6 +433,12 @@
       "away": "Austria",
       "hg": 3,
       "ag": 3
+    },
+    {
+      "home": "South Africa",
+      "away": "Canada",
+      "hg": 0,
+      "ag": 1
     }
   ]
 }
