@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-30T17:29:40.486Z",
+  "updated": "2026-06-30T22:05:10.291Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -457,6 +457,12 @@
       "away": "Morocco",
       "hg": 3,
       "ag": 4
+    },
+    {
+      "home": "Ivory Coast",
+      "away": "Norway",
+      "hg": 1,
+      "ag": 2
     }
   ]
 }
