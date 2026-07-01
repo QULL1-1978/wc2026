@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-30T22:05:10.291Z",
+  "updated": "2026-07-01T10:56:28.389Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -463,6 +463,18 @@
       "away": "Norway",
       "hg": 1,
       "ag": 2
+    },
+    {
+      "home": "France",
+      "away": "Sweden",
+      "hg": 3,
+      "ag": 0
+    },
+    {
+      "home": "Mexico",
+      "away": "Ecuador",
+      "hg": 2,
+      "ag": 0
     }
   ]
 }
