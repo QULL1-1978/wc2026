@@ -1015,6 +1015,14 @@ function drawBracketConnectors() {
 function renderKnockoutTab() {
   const all = resolveAllKnockout();
 
+  // How many knockout matches actually have a real result yet?
+  const koIds = [...R32, ...R16, ...QF, ...SF, FINAL, THIRD_PLACE].map(x => x.id);
+  const koActuals = koIds.filter(id => { const a = getActual(id); return a && a.hg != null && a.ag != null; }).length;
+  const noteMsg = koActuals === 0
+    ? "⚠️ Knockout matches begin <strong>June 28</strong>, so the bracket below is currently <strong>all projections</strong>. As real results come in they'll override the predictions (turn <span style='color:var(--good)'>green</span>) and automatically re-flow the rest of the tree. Your actual group results already decide who's projected into the Round of 32."
+    : `<strong>${koActuals}</strong> actual knockout result(s) are in (shown in <span style='color:var(--good)'>green</span>) and the tree has re-flowed around them; the rest stays projected.`;
+  const koNote = `<div style="background:rgba(56,132,255,.09);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.55">${noteMsg}</div>`;
+
   const r32Cards = R32.map((m, i) => {
     const r = all.r32[m.id];
     return renderKoMatch(r.match, `R32 · M${73+i}`, r.result);
@@ -1046,6 +1054,7 @@ function renderKnockoutTab() {
       <span>🏆 projected champion</span>
       <span style="margin-left:auto;opacity:.75">scroll sideways for later rounds →</span>
     </div>
+    ${koNote}
     ${renderBracket(all)}
     <details class="ko-entry">
       <summary>Enter or edit knockout scores manually</summary>
