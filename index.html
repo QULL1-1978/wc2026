@@ -167,6 +167,36 @@
   .third-places tr.out td { color: var(--muted); }
 
   .flag { font-size: 14px; }
+
+  /* Knockout bracket tree */
+  .bk-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted); margin: 2px 0 10px; align-items: center; }
+  .bk-legend .sw { display: inline-block; width: 20px; border-top: 2px solid; vertical-align: middle; margin-right: 5px; }
+  .bracket-wrap { overflow-x: auto; overflow-y: hidden; padding: 4px 2px 16px; }
+  .bracket { display: flex; gap: 30px; position: relative; min-width: max-content; align-items: stretch; }
+  .bk-connectors { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
+  .bk-connectors path { stroke: var(--border); stroke-width: 1.5px; fill: none; }
+  .bk-round { display: flex; flex-direction: column; min-width: 118px; z-index: 1; }
+  .bk-round.final-col { min-width: 156px; }
+  .bk-round-title { flex: 0 0 auto; text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding-bottom: 6px; }
+  .bk-round-body { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: space-around; gap: 6px; }
+  .final-col .bk-round-body { justify-content: center; gap: 12px; }
+  .bk-match { background: var(--card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .bk-match.pred { border-style: dashed; }
+  .bk-match.actual { border-color: var(--good); box-shadow: 0 0 0 1px rgba(34,197,94,.25); }
+  .bk-team { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 3px 6px; font-size: 11.5px; line-height: 1.35; }
+  .bk-team + .bk-team { border-top: 1px solid var(--border); }
+  .bk-team .nm { display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bk-team.win { font-weight: 700; color: var(--text); background: rgba(34,197,94,.12); }
+  .bk-team.lose { color: var(--muted); }
+  .bk-team .tbd { font-style: italic; opacity: .6; }
+  .bk-sc { font-variant-numeric: tabular-nums; min-width: 12px; text-align: center; }
+  .bk-pen { font-size: 9px; color: var(--muted); text-align: center; padding: 1px 4px 2px; border-top: 1px dotted var(--border); }
+  .bk-champ { text-align: center; font-weight: 700; font-size: 13px; padding: 7px 6px; border: 1px solid var(--good); border-radius: 6px; background: rgba(34,197,94,.12); }
+  .bk-third { margin-top: 4px; }
+  .bk-third-lbl { text-align: center; font-size: 9px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 3px; }
+  details.ko-entry { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 10px; }
+  details.ko-entry summary { cursor: pointer; color: var(--accent); font-size: 13px; margin-bottom: 8px; }
+
   @media (max-width: 600px) {
     main { padding: 12px; }
     .groups-grid { grid-template-columns: 1fr; }
@@ -909,6 +939,79 @@ function renderKoMatch(m, label, resolution) {
   </div>`;
 }
 
+/* ============================================================
+   KNOCKOUT BRACKET (visual tree) — reads live/predicted results
+   ============================================================ */
+function bkTeamRow(code, score, isWinner, resolved) {
+  if (!code) return `<div class="bk-team lose"><span class="nm tbd">TBD</span><span class="bk-sc"></span></div>`;
+  const t = TEAMS[code];
+  const cls = resolved ? (isWinner ? "win" : "lose") : "";
+  return `<div class="bk-team ${cls}"><span class="nm"><span class="flag">${t.flag}</span> ${code}</span><span class="bk-sc">${score != null ? score : ""}</span></div>`;
+}
+function bkMatchBox(id, match, result) {
+  const home = match.home, away = match.away;
+  const resolved = !!(result && result.hg != null && result.ag != null);
+  const isActual = !!(result && result.isActual);
+  const hw = resolved && result.winner === home;
+  const aw = resolved && result.winner === away;
+  const pens = resolved && result.pens;
+  const stateCls = !resolved ? "tbd" : (isActual ? "actual" : "pred");
+  const penLine = pens ? `<div class="bk-pen">${isActual ? "" : "pred "}pens: ${result.winner}</div>` : "";
+  return `<div class="bk-match ${stateCls}" data-mid="${id}">
+      ${bkTeamRow(home, result && result.hg, hw, resolved)}
+      ${bkTeamRow(away, result && result.ag, aw, resolved)}
+      ${penLine}
+    </div>`;
+}
+function renderBracket(all) {
+  const col = (title, ids, get, extraCls) =>
+    `<div class="bk-round ${extraCls || ""}"><div class="bk-round-title">${title}</div><div class="bk-round-body">${ids.map(get).join("")}</div></div>`;
+  // Column orderings derived from the bracket wiring so feeders sit adjacent
+  const r32 = col("Round of 32", R16.flatMap(m => m.src), id => bkMatchBox(id, all.r32[id].match, all.r32[id].result));
+  const r16 = col("Round of 16", QF.flatMap(m => m.src), id => bkMatchBox(id, all.r16[id].match, all.r16[id].result));
+  const qf  = col("Quarter-finals", SF.flatMap(m => m.src), id => bkMatchBox(id, all.qf[id].match, all.qf[id].result));
+  const sf  = col("Semi-finals", FINAL.src, id => bkMatchBox(id, all.sf[id].match, all.sf[id].result));
+  const fres = all.final.resolved, champ = fres && fres.winner;
+  const finalCol = `<div class="bk-round final-col"><div class="bk-round-title">Final</div><div class="bk-round-body">
+      ${bkMatchBox(FINAL.id, { home: all.final.home, away: all.final.away }, fres)}
+      ${champ ? `<div class="bk-champ">🏆 <span class="flag">${TEAMS[champ].flag}</span> ${TEAMS[champ].name}</div>` : ""}
+      <div class="bk-third"><div class="bk-third-lbl">3rd place</div>${bkMatchBox(THIRD_PLACE.id, { home: all.tp.home, away: all.tp.away }, all.tp.resolved)}</div>
+    </div></div>`;
+  return `<div class="bracket-wrap"><div class="bracket" id="bracketRoot">
+      <svg class="bk-connectors" id="bkSvg" aria-hidden="true"></svg>
+      ${r32}${r16}${qf}${sf}${finalCol}
+    </div></div>`;
+}
+function drawBracketConnectors() {
+  const root = document.getElementById("bracketRoot");
+  const svg = document.getElementById("bkSvg");
+  if (!root || !svg) return;
+  const rb = root.getBoundingClientRect();
+  const W = root.scrollWidth, H = root.scrollHeight;
+  svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const pos = (id) => {
+    const el = root.querySelector(`[data-mid="${id}"]`);
+    if (!el) return null;
+    const b = el.getBoundingClientRect();
+    return { l: b.left - rb.left, r: b.right - rb.left, y: b.top - rb.top + b.height / 2 };
+  };
+  const pairs = [];
+  R16.forEach(m => pairs.push([m.id, m.src]));
+  QF.forEach(m => pairs.push([m.id, m.src]));
+  SF.forEach(m => pairs.push([m.id, m.src]));
+  pairs.push([FINAL.id, FINAL.src]);
+  let d = "";
+  for (const [child, feeders] of pairs) {
+    const c = pos(child); if (!c) continue;
+    for (const f of feeders) {
+      const p = pos(f); if (!p) continue;
+      const mx = (p.r + c.l) / 2;
+      d += `<path d="M${p.r} ${p.y} H${mx} V${c.y} H${c.l}"/>`;
+    }
+  }
+  svg.innerHTML = d;
+}
+
 function renderKnockoutTab() {
   const all = resolveAllKnockout();
 
@@ -936,12 +1039,23 @@ function renderKnockoutTab() {
   const finalCard = renderKoMatch(all.final, "FINAL · M104", all.final.resolved);
 
   return `
-    <div class="ko-section"><h2>Round of 32</h2><div class="ko-grid">${r32Cards}</div></div>
-    <div class="ko-section"><h2>Round of 16</h2><div class="ko-grid">${r16Cards}</div></div>
-    <div class="ko-section"><h2>Quarterfinals</h2><div class="ko-grid">${qfCards}</div></div>
-    <div class="ko-section"><h2>Semifinals</h2><div class="ko-grid">${sfCards}</div></div>
-    <div class="ko-section"><h2>Third-place playoff</h2><div class="ko-grid">${tpCard}</div></div>
-    <div class="ko-section"><h2>Final</h2><div class="ko-grid">${finalCard}</div></div>
+    <h2>Knockout bracket</h2>
+    <div class="bk-legend">
+      <span><span class="sw" style="border-color:var(--good)"></span>actual result</span>
+      <span><span class="sw" style="border-color:var(--muted);border-top-style:dashed"></span>predicted</span>
+      <span>🏆 projected champion</span>
+      <span style="margin-left:auto;opacity:.75">scroll sideways for later rounds →</span>
+    </div>
+    ${renderBracket(all)}
+    <details class="ko-entry">
+      <summary>Enter or edit knockout scores manually</summary>
+      <div class="ko-section"><h2>Round of 32</h2><div class="ko-grid">${r32Cards}</div></div>
+      <div class="ko-section"><h2>Round of 16</h2><div class="ko-grid">${r16Cards}</div></div>
+      <div class="ko-section"><h2>Quarterfinals</h2><div class="ko-grid">${qfCards}</div></div>
+      <div class="ko-section"><h2>Semifinals</h2><div class="ko-grid">${sfCards}</div></div>
+      <div class="ko-section"><h2>Third-place playoff</h2><div class="ko-grid">${tpCard}</div></div>
+      <div class="ko-section"><h2>Final</h2><div class="ko-grid">${finalCard}</div></div>
+    </details>
   `;
 }
 
@@ -1020,10 +1134,14 @@ function render() {
     content.innerHTML = renderGroupsTab();
   } else if (currentTab === "knockout") {
     content.innerHTML = renderKnockoutTab();
+    requestAnimationFrame(drawBracketConnectors);
   } else {
     content.innerHTML = renderModelTab();
   }
 }
+
+// Redraw bracket connector lines when the layout width changes
+window.addEventListener("resize", () => { if (currentTab === "knockout") drawBracketConnectors(); });
 
 /* ============================================================
    AUTO-FILL: official results from results.json (cloud job)
