@@ -518,6 +518,10 @@ let actualScores = JSON.parse(localStorage.getItem(STATE_KEY) || "{}");
 // Precedence: a manual entry always wins over the auto-fill, so you can correct it.
 let officialResults = {};
 let officialMeta = { updated: null };
+// Results-driven third-place slot assignment: matchId -> team code.
+// FIFA's official 3rd-place allocation table is approximated greedily; once a
+// real R32 result is in, we pin the actual 3rd-placed opponent to its slot.
+let thirdOverride = {};
 function getActual(id) { return actualScores[id] || officialResults[id]; }
 function isAuto(id) { return !actualScores[id] && !!officialResults[id]; }
 
@@ -695,9 +699,15 @@ function resolveR32() {
     }
     return null;
   }
+  // Reserve results-driven third-place overrides so greedy won't reuse them
+  for (const m of R32) { if (thirdOverride[m.id]) used.add(thirdOverride[m.id]); }
   return R32.map(m => {
-    const a = /^3:/.test(m.slotA) ? pickThird(m.slotA.slice(2).split("")) : resolveSlot(m.slotA, standings, qualifiedThirds);
-    const b = /^3:/.test(m.slotB) ? pickThird(m.slotB.slice(2).split("")) : resolveSlot(m.slotB, standings, qualifiedThirds);
+    const aThird = /^3:/.test(m.slotA), bThird = /^3:/.test(m.slotB);
+    let a = aThird ? null : resolveSlot(m.slotA, standings, qualifiedThirds);
+    let b = bThird ? null : resolveSlot(m.slotB, standings, qualifiedThirds);
+    if (thirdOverride[m.id]) { if (aThird) a = thirdOverride[m.id]; else if (bThird) b = thirdOverride[m.id]; }
+    if (aThird && a == null) a = pickThird(m.slotA.slice(2).split(""));
+    if (bThird && b == null) b = pickThird(m.slotB.slice(2).split(""));
     return { ...m, home: a, away: b };
   });
 }
@@ -1168,7 +1178,7 @@ const NAME2CODE = (function () {
     usa: "USA", us: "USA", unitedstatesofamerica: "USA",
     korearepublic: "KOR", republicofkorea: "KOR", korea: "KOR",
     turkey: "TUR", bosniaandherzegovina: "BIH", bosniaherzegovina: "BIH", bosnia: "BIH",
-    cotedivoire: "CIV", ivorycoast: "CIV", caboverde: "CPV", czechrepublic: "CZE",
+    cotedivoire: "CIV", ivorycoast: "CIV", caboverde: "CPV", capeverdeislands: "CPV", caboverdeislands: "CPV", czechrepublic: "CZE",
     drcongo: "COD", congodr: "COD", democraticrepublicofthecongo: "COD",
     holland: "NED", iririran: "IRN", iriran: "IRN", iran: "IRN"
   };
@@ -1206,6 +1216,29 @@ function applyOfficialResults(list) {
       m.used = true;
       officialResults[fix.id] = (m.cH === fix.home) ? { hg: m.hg, ag: m.ag } : { hg: m.ag, ag: m.hg };
     }
+
+    // 1.5) Results-driven third-place assignment. FIFA's official allocation of
+    //      3rd-placed teams to R32 slots is only approximated greedily; here we
+    //      pin the ACTUAL opponent of each group winner/runner-up whose R32 game
+    //      is already played, so real results map to the right slot.
+    thirdOverride = {};
+    try {
+      const standings = allGroupStandings();
+      const qual = bestThirdPlaces(standings).slice(0, 8);
+      const qualTeams = new Set(qual.map(t => t.team));
+      const groupOf = {}; qual.forEach(t => groupOf[t.team] = t.group);
+      for (const km of R32) {
+        const aThird = /^3:/.test(km.slotA), bThird = /^3:/.test(km.slotB);
+        if (!aThird && !bThird) continue;
+        const detTeam = resolveSlot(aThird ? km.slotB : km.slotA, standings, qual);
+        if (!detTeam) continue;
+        const cand = (aThird ? km.slotA : km.slotB).slice(2).split("");
+        const r = parsed.find(p => !p.used && (p.cH === detTeam || p.cA === detTeam));
+        if (!r) continue;
+        const other = r.cH === detTeam ? r.cA : r.cH;
+        if (qualTeams.has(other) && cand.includes(groupOf[other])) thirdOverride[km.id] = other;
+      }
+    } catch (e) { thirdOverride = {}; }
 
     // 2) Knockout games — resolve bracket, match remaining results to slots, repeat
     for (let pass = 0; pass < 7; pass++) {
