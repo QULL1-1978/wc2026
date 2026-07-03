@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-02T20:43:59.235Z",
+  "updated": "2026-07-03T08:37:47.134Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -491,6 +491,24 @@
     {
       "home": "United States",
       "away": "Bosnia-Herzegovina",
+      "hg": 2,
+      "ag": 0
+    },
+    {
+      "home": "Spain",
+      "away": "Austria",
+      "hg": 3,
+      "ag": 0
+    },
+    {
+      "home": "Portugal",
+      "away": "Croatia",
+      "hg": 2,
+      "ag": 1
+    },
+    {
+      "home": "Switzerland",
+      "away": "Algeria",
       "hg": 2,
       "ag": 0
     }
