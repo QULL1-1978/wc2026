@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-03T20:34:38.961Z",
+  "updated": "2026-07-04T07:28:27.390Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -510,6 +510,24 @@
       "home": "Switzerland",
       "away": "Algeria",
       "hg": 2,
+      "ag": 0
+    },
+    {
+      "home": "Australia",
+      "away": "Egypt",
+      "hg": 3,
+      "ag": 5
+    },
+    {
+      "home": "Argentina",
+      "away": "Cape Verde Islands",
+      "hg": 3,
+      "ag": 2
+    },
+    {
+      "home": "Colombia",
+      "away": "Ghana",
+      "hg": 1,
       "ag": 0
     }
   ]
