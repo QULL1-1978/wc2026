@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-04T20:13:56.457Z",
+  "updated": "2026-07-04T23:46:35.629Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -535,6 +535,12 @@
       "away": "Morocco",
       "hg": 0,
       "ag": 3
+    },
+    {
+      "home": "Paraguay",
+      "away": "France",
+      "hg": 0,
+      "ag": 1
     }
   ]
 }
