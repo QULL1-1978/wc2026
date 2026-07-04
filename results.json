@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-04T15:47:53.603Z",
+  "updated": "2026-07-04T20:13:56.457Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -529,6 +529,12 @@
       "away": "Ghana",
       "hg": 1,
       "ag": 0
+    },
+    {
+      "home": "Canada",
+      "away": "Morocco",
+      "hg": 0,
+      "ag": 3
     }
   ]
 }
