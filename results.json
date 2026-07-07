@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-06T23:40:25.396Z",
+  "updated": "2026-07-07T11:20:36.923Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -559,6 +559,12 @@
       "away": "Spain",
       "hg": 0,
       "ag": 1
+    },
+    {
+      "home": "United States",
+      "away": "Belgium",
+      "hg": 1,
+      "ag": 4
     }
   ]
 }
