@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-11T20:29:50.888Z",
+  "updated": "2026-07-11T23:38:19.079Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -547,12 +547,6 @@
       "away": "Norway",
       "hg": 1,
       "ag": 2
-    },
-    {
-      "home": "Mexico",
-      "away": "England",
-      "hg": 2,
-      "ag": 3
     },
     {
       "home": "Portugal",
