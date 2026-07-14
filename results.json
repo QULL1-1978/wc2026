@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-14T20:40:59.981Z",
+  "updated": "2026-07-14T21:42:30.504Z",
   "source": "football-data.org",
   "matches": [
     {
@@ -601,6 +601,12 @@
       "away": "Switzerland",
       "hg": 3,
       "ag": 1
+    },
+    {
+      "home": "France",
+      "away": "Spain",
+      "hg": 0,
+      "ag": 2
     }
   ]
 }
